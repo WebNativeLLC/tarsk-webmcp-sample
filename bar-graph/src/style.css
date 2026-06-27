@@ -28,8 +28,10 @@ body {
 }
 
 #app {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  min-height: 100%;
+  min-height: 100svh;
 }
 
 .bar-graph-state {
@@ -39,9 +41,10 @@ body {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
-  min-height: 100%;
+  min-height: 100svh;
   padding: 0;
   overflow: auto;
   text-align: center;
@@ -52,6 +55,25 @@ body {
 
 .bar-graph-state--skeleton {
   background: linear-gradient(180deg, #e2e8f0 0%, #f8fafc 100%);
+  justify-content: center;
+}
+
+.bar-graph-state--skeleton .bar-chart-skeleton-trigger {
+  flex: 0 1 auto;
+  height: auto;
+}
+
+.bar-chart-skeleton {
+  flex: 0 1 auto;
+}
+
+.bar-chart-skeleton .bar-chart__plot--horizontal,
+.bar-chart-skeleton .bar-chart__plot--vertical {
+  flex: 0 1 auto;
+}
+
+.bar-chart-skeleton .bar-chart__plot--vertical .bar-chart__bars {
+  flex: 0 1 auto;
 }
 
 .bar-chart-skeleton-trigger {
