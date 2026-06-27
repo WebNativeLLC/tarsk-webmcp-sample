@@ -72,13 +72,18 @@ function wlog(...args: unknown[]): void {
 }
 
 function reply(event: MessageEvent, message: object): void {
-  const target = event.source as Window | null
+  // WebKit / WKWebView frequently delivers messages from the parent frame with
+  // a null `event.source`, so fall back to `window.parent` (the only frame that
+  // talks to this widget). Without this, replies silently never get sent.
+  const target = (event.source as Window | null) ?? (window.parent !== window ? window.parent : null)
   if (!target) {
-    console.warn('[webmcp-widget] cannot reply: event.source is null')
+    console.warn('[webmcp-widget] cannot reply: no target window (event.source and window.parent both unavailable)')
     return
   }
-  wlog('-> reply', (message as { action?: string }).action, 'to', event.origin || '*')
-  target.postMessage(message, event.origin || '*')
+  // `event.origin` can be "null"/empty in sandboxed contexts; "*" is safe here.
+  const targetOrigin = event.origin && event.origin !== 'null' ? event.origin : '*'
+  wlog('-> reply', (message as { action?: string }).action, 'to', targetOrigin)
+  target.postMessage(message, targetOrigin)
 }
 
 function parseInputSchema(raw: string | undefined): Record<string, unknown> | undefined {
@@ -91,22 +96,37 @@ function parseInputSchema(raw: string | undefined): Record<string, unknown> | un
 }
 
 async function handleGetTools(event: MessageEvent, request: GetToolsRequest): Promise<void> {
-  const ctx = getModelContext()
-  if (!ctx) wlog('getTools: document.modelContext is not available')
-  const rawTools = ctx ? await ctx.getTools() : []
-  wlog('getTools ->', rawTools.length, 'tool(s):', rawTools.map((t) => t.name))
-  const tools = rawTools.map((tool) => ({
-    name: tool.name,
-    description: tool.description,
-    inputSchema: parseInputSchema(tool.inputSchema),
-    title: tool.title,
-  }))
+  let tools: ReturnType<typeof mapTools> = []
+  try {
+    const ctx = getModelContext()
+    if (!ctx) wlog('getTools: document.modelContext is not available')
+    const rawTools = ctx ? await ctx.getTools() : []
+    wlog('getTools ->', rawTools.length, 'tool(s):', rawTools.map((t) => t.name))
+    tools = mapTools(rawTools)
+  } catch (error) {
+    // Always reply (with whatever we have) so the parent never just times out.
+    console.error('[webmcp-widget] getTools failed', error)
+  }
   reply(event, {
     source: WIDGET_MESSAGE_SOURCE,
     requestId: request.requestId,
     action: WIDGET_MESSAGE_ACTIONS.getToolsResponse,
     tools,
   })
+}
+
+function mapTools(rawTools: ToolInfo[]): Array<{
+  name: string
+  description: string
+  inputSchema?: Record<string, unknown>
+  title?: string
+}> {
+  return rawTools.map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    inputSchema: parseInputSchema(tool.inputSchema),
+    title: tool.title,
+  }))
 }
 
 async function handleCallTool(event: MessageEvent, request: CallToolRequest): Promise<void> {
