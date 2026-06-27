@@ -24,6 +24,8 @@ app.innerHTML = `<div id="weather" class="weather-state" aria-live="polite"></di
 
 const weatherEl = app.querySelector<HTMLDivElement>('#weather')!
 
+let displayedZip: string | null = null
+
 function showSkeleton() {
   weatherEl.className = 'weather-state weather-bg weather-bg--skeleton'
   weatherEl.innerHTML = renderWeatherSkeleton()
@@ -43,7 +45,12 @@ async function loadWeather(zipcode: string) {
   showSkeleton()
   const weather = await fetchWeather(zipcode)
   showWeather(weather)
+  displayedZip = weather.zipcode
   return weather
+}
+
+function alreadyDisplayingMessage(currentZip: string, requestedZip: string): string {
+  return `Weather is already displaying for ${currentZip}. Open another widget for ${requestedZip}`
 }
 
 document.modelContext.registerTool({
@@ -61,6 +68,13 @@ document.modelContext.registerTool({
   },
   async execute(args) {
     const zipcode = String(args.zipcode).trim()
+
+    if (displayedZip !== null && displayedZip !== zipcode) {
+      return {
+        content: [{ type: 'text', text: alreadyDisplayingMessage(displayedZip, zipcode) }],
+        isError: true,
+      }
+    }
 
     try {
       const weather = await loadWeather(zipcode)
