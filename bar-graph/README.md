@@ -1,4 +1,4 @@
-# Bar Graph WebMCP Widget
+# Bar Graph Widget
 
 Embeddable bar chart widget for Tarsk. An agent passes labeled numeric data and display options; the widget renders a bar graph and returns a text summary.
 
