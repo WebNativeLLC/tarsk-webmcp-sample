@@ -8,8 +8,16 @@ import {
   renderWeatherWidget,
 } from './weather.ts'
 
-initializeWebMCPPolyfill()
+// Attach the parent<->iframe message bridge FIRST and unconditionally, so the
+// widget always answers getTools/callTool even if polyfill init below throws
+// (otherwise the parent's handshake would silently time out).
 initializeWidgetBridge()
+
+try {
+  initializeWebMCPPolyfill()
+} catch (error) {
+  console.error('[webmcp-widget] initializeWebMCPPolyfill failed', error)
+}
 
 document.modelContext.registerTool({
   name: 'get-weather',
