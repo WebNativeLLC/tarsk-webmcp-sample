@@ -15,7 +15,7 @@ Embeddable bar chart widget for Tarsk. An agent passes labeled numeric data and 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `chartTitle` | string | — | Heading above the chart |
-| `orientation` | `"vertical"` \| `"horizontal"` | `"vertical"` | Bar direction |
+| `orientation` | `"vertical"` \| `"horizontal"` | `"horizontal"` | Bar direction |
 | `showValues` | boolean | `true` | Show value labels on bars |
 | `valuePrefix` | string | `""` | Prefix for labels (e.g. `"$"`) |
 | `valueSuffix` | string | `""` | Suffix for labels (e.g. `"%"`, `"k"`) |
@@ -39,7 +39,7 @@ Embeddable bar chart widget for Tarsk. An agent passes labeled numeric data and 
     { "title": "East", "value": 310 },
     { "title": "West", "value": 495 }
   ],
-  "orientation": "vertical",
+  "orientation": "horizontal",
   "valuePrefix": "$",
   "valueSuffix": "k",
   "sort": "value-desc",

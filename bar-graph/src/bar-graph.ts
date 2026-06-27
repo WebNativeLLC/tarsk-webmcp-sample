@@ -29,7 +29,7 @@ export interface ParsedBarGraphInput {
 }
 
 const DEFAULT_OPTIONS: BarGraphOptions = {
-  orientation: 'vertical',
+  orientation: 'horizontal',
   showValues: true,
   valuePrefix: '',
   valueSuffix: '',
@@ -213,10 +213,10 @@ function renderVerticalBars(
       return `
         <div class="bar-chart__bar-group" style="--bar-index: ${index}">
           ${valueHtml}
-          <div class="bar-chart__bar-wrap">
-            <div class="bar-chart__bar" style="height: ${height}%"></div>
+          <div class="bar-chart__bar-wrap" style="--bar-pct: ${height}">
+            <div class="bar-chart__bar"></div>
           </div>
-          <span class="bar-chart__label">${escapeHtml(point.title)}</span>
+          <span class="bar-chart__label" title="${escapeHtml(point.title)}">${escapeHtml(point.title)}</span>
         </div>
       `
     })
@@ -342,7 +342,15 @@ export function renderBarGraphSkeleton(orientation: BarOrientation = 'horizontal
       <div class="bar-chart__plot bar-chart__plot--vertical">
         <div class="bar-chart__bars">
           ${[72, 48, 90, 56]
-            .map((height) => `<div class="skeleton skeleton-bar-v" style="height: ${height}%"></div>`)
+            .map(
+              (height) => `
+            <div class="bar-chart__bar-group">
+              <div class="bar-chart__bar-wrap" style="--bar-pct: ${height}">
+                <div class="skeleton skeleton-bar-v"></div>
+              </div>
+            </div>
+          `,
+            )
             .join('')}
         </div>
       </div>

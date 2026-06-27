@@ -87,7 +87,7 @@ function registerWebMCPTools(): void {
           orientation: {
             type: 'string',
             enum: ['vertical', 'horizontal'],
-            description: 'Bar direction. Default: vertical',
+            description: 'Bar direction. Default: horizontal',
           },
           showValues: {
             type: 'boolean',
