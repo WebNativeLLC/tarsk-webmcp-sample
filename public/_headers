@@ -1,0 +1,5 @@
+# Allow this widget to be embedded as a cross-origin iframe inside a
+# cross-origin-isolated (COEP: require-corp) host such as the Tarsk app.
+/*
+  Cross-Origin-Resource-Policy: cross-origin
+  Cross-Origin-Embedder-Policy: credentialless
